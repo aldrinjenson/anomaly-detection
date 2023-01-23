@@ -7,7 +7,7 @@ def processFrame(frame):
 
 # Define the video source for device 1
 # video_source_1 = "http://192.168.45.45:8080/video" # replace with ip web cam url
-video_source_1 = 0 # for accessing directly form webcam #
+video_source_1 = 0 # for accessing directly form webcam 
 # video_source_2 = "http://192.168.45.45:8080/video"  # another ip web cam url
 
 # Define the frame rate for both devices
@@ -15,7 +15,7 @@ video_source_1 = 0 # for accessing directly form webcam #
 frame_rate_1 = 30
 frame_rate_2 = 30
 
-frame_delimeter = 20 # process/save every nth frame from video stream only
+frame_delimeter = 20 # process/save every nth frame from video stream only instead of all frames
 
 # Initialize the variables for saving frames
 counter = 0
@@ -25,7 +25,7 @@ def save_frames(video_source, frame_rate):
   global counter
 
   # Create a VideoCapture object
-  cap = cv2.VideoCapture(video_source)
+  capture = cv2.VideoCapture(video_source)
 
   # Check if the video source is opened
   if not cap.isOpened():
@@ -33,7 +33,7 @@ def save_frames(video_source, frame_rate):
     return
 
   # Read the first frame
-  _, frame = cap.read()
+  _, frame = capture.read()
 
   # cv2.imshow('frame', frame) # add only if you want to see a live camera feed.
 
@@ -41,11 +41,11 @@ def save_frames(video_source, frame_rate):
   delay = int(1000 / frame_rate)
 
   while True:
-    # Read a new frame
+    # Read frames
     _, frame = cap.read()
 
-    # Check if the frame was correctly read
     if frame is None:
+      print("Error in reading frame correctly")
       break
 
     # Increment the counter
