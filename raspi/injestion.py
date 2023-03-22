@@ -1,12 +1,10 @@
-# to be running in raspberry pi
-
+import sys
+import threading
 import cv2
 import requests
-import threading
 
 frame_delimeter = 20
 counter = 0
-
 
 BACKEND_SERVER_ENDPOINT = "http://127.0.0.1:5000"
 
@@ -22,8 +20,6 @@ def capture_frames(video_source, frame_rate):
 
     # Read the first frame
     _, frame = capture.read()
-
-    # cv2.imshow('frame', frame) # add only if you want to see a live camera feed.
 
     # Set the delay based on the frame rate
     delay = int(1000 / frame_rate)
@@ -57,8 +53,14 @@ def capture_frames(video_source, frame_rate):
 
 
 if __name__ == '__main__':
-    video_source = 0
     frame_rate = 30
+    default_video_source = 0
+
+    if len(sys.argv) > 1:
+        video_source = sys.argv[1]
+    else:
+        video_source = 0
+    print(video_source)
 
     # Create and start the thread to capture frames from the camera
     threading.Thread(target=capture_frames, args=(

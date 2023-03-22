@@ -34,7 +34,7 @@ def process():
     npimg = np.fromfile(file, np.uint8)
     img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
-    # isAnomalyFound(frmae)
+    # isAnomalyFound(frame)
     # Process the frame and save it if anomalous
     counterVal = save_frame(img)
     return "Saved frame: " + str(counterVal)
