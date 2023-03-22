@@ -1,13 +1,21 @@
 # to be running in main server
+from dotenv import load_dotenv
 from flask import Flask, request
 import cv2
 import numpy as np
 import os
+import supabase
 
+load_dotenv()
 app = Flask(__name__)
 
 counter = 0
 frame_delimiter = 20
+
+
+# supabase_url = os.getenv("SUPABASE_URL")
+# supabase_key = os.getenv("SUPABASE_KEY")
+# supabase_client = supabase.create_client(supabase_url, supabase_key)
 
 
 def save_frame(frame):
