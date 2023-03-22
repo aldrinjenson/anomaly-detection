@@ -5,6 +5,7 @@ import requests
 
 frame_delimeter = 20
 counter = 0
+camera_id = 0
 
 BACKEND_SERVER_ENDPOINT = "http://127.0.0.1:5000"
 
@@ -41,7 +42,9 @@ def capture_frames(video_source, frame_rate):
 
             cv2.imshow('frame', frame)
             response = requests.post(f'{BACKEND_SERVER_ENDPOINT}/process',
+                                     data={'cameraId': camera_id},
                                      files={'image': ('image.jpg', img_encoded.tobytes())})
+
             print('Response:', response.status_code, response.content)
 
         # quit if the key "q" is pressed
@@ -56,10 +59,14 @@ if __name__ == '__main__':
     frame_rate = 30
     default_video_source = 0
 
-    if len(sys.argv) > 1:
+    print(sys.argv)
+    if len(sys.argv) > 2:
+        # video_source = int(sys.argv[1])
         video_source = sys.argv[1]
+        camera_id = sys.argv[2]
     else:
         video_source = 0
+        camera_id = 0
     print(video_source)
 
     # Create and start the thread to capture frames from the camera
