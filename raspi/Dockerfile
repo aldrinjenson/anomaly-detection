@@ -12,7 +12,7 @@ RUN apt-get update && \
 COPY injestion.py .
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Start the script
 CMD ["python", "injestion.py"]

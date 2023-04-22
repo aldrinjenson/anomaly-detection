@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Set the environment variable for Flask
 ENV FLASK_APP mainServer.py
@@ -18,4 +18,5 @@ ENV FLASK_APP mainServer.py
 EXPOSE 5000
 
 # Start the app
-CMD ["flask", "run", "--host", "0.0.0.0", "--port", "5000"]
+# CMD ["flask", "run", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["python", "mainServer.py"]
