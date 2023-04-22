@@ -7,8 +7,7 @@ frame_delimeter = 20
 counter = 0
 camera_id = 0
 
-BACKEND_SERVER_ENDPOINT = "http://127.0.0.1:5000"
-
+BACKEND_SERVER_ENDPOINT = os.getenv("BACKEND_SERVER_ENDPOINT")
 
 def capture_frames(video_source, frame_rate):
     global counter

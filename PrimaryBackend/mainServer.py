@@ -23,6 +23,7 @@ def insertCameraToDb():
             "lat": 37.7749,
             "lng": -122.4194
         },
+        "frame_rate": 30,
         "camera_description": "Camera at Fort Kochi Junction"
     }
 
@@ -34,6 +35,8 @@ def insertCameraToDb():
     else:
         print("Failed to insert new row: " + insert_result["error"]["message"])
 
+def switchModel():
+    pass
 
 def logAnomalyToDb():
     newAnomaly = {
@@ -47,6 +50,10 @@ def logAnomalyToDb():
         print("New row was inserted successfully!")
     else:
         print("Failed to insert new row: " + insert_result["error"]["message"])
+
+
+# logAnomalyToDb()
+# insertCameraToDb()
 
 
 def save_frame(camera_id, frame):
