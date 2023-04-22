@@ -2,6 +2,9 @@ import sys
 import threading
 import cv2
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 frame_delimeter = 20
 counter = 0
