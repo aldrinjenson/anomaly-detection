@@ -20,8 +20,6 @@ ENV FLASK_APP mainServer.py
 # Expose the port that the app will run on
 EXPOSE 5000
 
-CMD ["python3", "-m" , "flask", "run", "--host=0.0.0.0", "--app mainServer.py"]
-
-
-# Start the app
-CMD ["flask", "run", "--host", "0.0.0.0", "--port", "5000"]
+# CMD ["python3", "-m" , "flask", "run", "--host=0.0.0.0", "--app mainServer.py"]
+# run flask in production
+CMD ["waitress-serve", "mainServer:app"]
