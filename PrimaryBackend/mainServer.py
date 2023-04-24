@@ -35,8 +35,10 @@ def insertCameraToDb():
     else:
         print("Failed to insert new row: " + insert_result["error"]["message"])
 
+
 def switchModel():
     pass
+
 
 def logAnomalyToDb():
     newAnomaly = {
@@ -64,6 +66,11 @@ def save_frame(camera_id, frame):
     cv2.imwrite("images/frame{}_{}.jpg".format(camera_id, counter), frame)
     print("Writing to file, frame: ", counter)
     return counter
+
+
+@app.route('/')
+def index():
+    return "Anomaly detection server - alive and kicking :)"
 
 
 @app.route('/process', methods=['POST'])
