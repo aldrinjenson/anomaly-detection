@@ -70,7 +70,12 @@ def save_frame(camera_id, frame):
 
 @app.route('/')
 def index():
-    return "Anomaly detection server - alive and kicking :)"
+    return "Anomaly detection server - alive and kicking 🤟"
+
+
+@app.route('/test')
+def index():
+    return "Yes, working fine"
 
 
 @app.route('/process', methods=['POST'])
