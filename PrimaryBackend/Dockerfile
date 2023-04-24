@@ -6,9 +6,13 @@ WORKDIR /app
 
 # Copy the app files to the container
 COPY . .
+ 
+RUN pip3 install -r requirements.txt
 
-# Install dependencies
-RUN pip install -r requirements.txt
+# RUN apt-get update && \
+#   apt-get install -y libglib2.0-0
+
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
 # Set the environment variable for Flask
 ENV FLASK_APP mainServer.py
@@ -16,6 +20,8 @@ ENV FLASK_APP mainServer.py
 # Expose the port that the app will run on
 EXPOSE 5000
 
+CMD ["python3", "-m" , "flask", "run", "--host=0.0.0.0", "--app mainServer.py"]
+
+
 # Start the app
-# CMD ["flask", "run", "--host", "0.0.0.0", "--port", "5000"]
-CMD ["python", "mainServer.py"]
+CMD ["flask", "run", "--host", "0.0.0.0", "--port", "5000"]
