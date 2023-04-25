@@ -68,6 +68,10 @@ def save_frame(camera_id, frame):
     return counter
 
 
+def checkForAnomaly(frame):
+    return False
+
+
 @app.route('/')
 def index():
     return "Anomaly detection server - alive and kicking 🤟"
@@ -86,9 +90,9 @@ def process():
     npimg = np.fromfile(file, np.uint8)
     img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
-    # anomaly = checkForAnomaly(frame)
-    # if anomaly != None:
-    #     logAnomalyToDb(anomaly, camera_id)
+    anomaly = checkForAnomaly(frame)
+    if anomaly:
+        logAnomalyToDb(anomaly, camera_id)
     counterVal = save_frame(camera_id, img)
     return "Saved frame: " + str(counterVal)
 
