@@ -23,7 +23,7 @@ def image_classifier(inp):
         text_features /= text_features.norm(dim=-1, keepdim=True)
 
         text_probs = (100.0 * image_features @ text_features.T).softmax(dim=-1)
-        print("Label probs:", text_probs)  # prints: [[1., 0., 0.]]
+        print("Label probs:", text_probs)
         text_probs = text_probs[0]
         print(text_probs[0])
 
@@ -34,12 +34,12 @@ def image_classifier(inp):
                 ansIndex = idx
                 maxProb = probs
 
-        obj = {}
-        for i in range(len(labels)):
-            currLabel = labels[i]
-            currProb = text_probs[i]
-            obj[currLabel] = currProb
-        print(obj)
+        # obj = {}
+        # for i in range(len(labels)):
+        #     currLabel = labels[i]
+        #     currProb = text_probs[i]
+        #     obj[currLabel] = currProb
+        # print(obj)
         return {labels[ansIndex]: 1}
 
 
