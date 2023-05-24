@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import os
 import supabase
+from classifier import image_classifier
 
 load_dotenv()
 app = Flask(__name__)
@@ -36,17 +37,19 @@ def insertCameraToDb():
         print("Failed to insert new row: " + insert_result["error"]["message"])
 
 
-def switchModel():
-    pass
 
-
-def logAnomalyToDb():
+def classifyAndLogAnomalyToDb(anomalyFrame, cameraId):
+    anomalyClass = image_classifier(anomalyFrame)
     newAnomaly = {
         "class": "Fire Hazard",
         "camera_id": 8,
+        "latitude": 10.0431,
+        "longitude": 76.3244,
+        "anomaly_id": 5
     }
     insert_result = supabase_client.table(
-        "anomalies").insert(newAnomaly).execute()
+        "alerts").insert(newAnomaly).execute()
+    print(insert_result)
 
     if insert_result:
         print("New row was inserted successfully!")
@@ -54,7 +57,7 @@ def logAnomalyToDb():
         print("Failed to insert new row: " + insert_result["error"]["message"])
 
 
-# logAnomalyToDb()
+# classifyAndLogAnomalyToDb()
 # insertCameraToDb()
 
 
@@ -69,7 +72,9 @@ def save_frame(camera_id, frame):
 
 
 def checkForAnomaly(frame):
-    return False
+    # call evaluate with frame
+    anomalyFrame = None
+    return anomalyFrame
 
 
 @app.route('/')
@@ -90,9 +95,9 @@ def process():
     npimg = np.fromfile(file, np.uint8)
     img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
-    anomaly = checkForAnomaly(frame)
+    anomalyFrame = checkForAnomaly(frame)
     if anomaly:
-        logAnomalyToDb(anomaly, camera_id)
+        classifyAndLogAnomalyToDb(anomalyFrame, camera_id)
     counterVal = save_frame(camera_id, img)
     return "Saved frame: " + str(counterVal)
 

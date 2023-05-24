@@ -9,3 +9,9 @@ services:
       - .env
     volumes:
       - .:/app
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: any
+      placement:
+        constraints: [node.role == worker]
