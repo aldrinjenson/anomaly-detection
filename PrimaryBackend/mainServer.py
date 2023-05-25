@@ -6,12 +6,13 @@ import numpy as np
 import os
 import supabase
 from classifier import image_classifier
+from anomaly_detector import evaluate
 
 load_dotenv()
 app = Flask(__name__)
 
 counter = 0
-frame_delimiter = 20
+frame_delimiter = 5
 
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_KEY")
@@ -25,7 +26,7 @@ def insertCameraToDb():
             "lng": -122.4194
         },
         "frame_rate": 30,
-        "camera_description": "Camera at Fort Kochi Junction"
+        "camera_description": "Camera at MEC"
     }
 
     insert_result = supabase_client.table(
@@ -40,6 +41,7 @@ def insertCameraToDb():
 
 def classifyAndLogAnomalyToDb(anomalyFrame, cameraId):
     anomalyClass = image_classifier(anomalyFrame)
+    anomalyClass = "Fire Hazard"
     newAnomaly = {
         "class": "Fire Hazard",
         "camera_id": 8,
@@ -71,8 +73,14 @@ def save_frame(camera_id, frame):
     return counter
 
 
-def checkForAnomaly(frame):
+def checkForAnomaly(files):
     # call evaluate with frame
+    # evaluate(files)
+    print(files)
+    print('after sorting')
+    fls = sorted(files)
+    print(fls)
+
     anomalyFrame = None
     return anomalyFrame
 
@@ -86,6 +94,21 @@ def index():
 def test():
     return "Yes, working fine"
 
+@app.route('/processfiles', methods=['POST'])
+def processfiles():
+    camera_id = request.form.get('cameraId')
+    files = request.files.getlist("files")
+
+    # for file in files:
+    #     file_path = os.path.join(os.getcwd(), 'uploadImages/')
+    #     file.save(os.path.join(file_path, file.filename))
+    print(files)
+    anomaly = checkForAnomaly(files)
+    if anomaly:
+        print(anomaly)
+        # classifyAndLogAnomalyToDb(anomaly, camera_id)
+    # counterVal = save_frame(camera_id, img)
+    return "Saved frame: " + str(counterVal)
 
 @app.route('/process', methods=['POST'])
 def process():

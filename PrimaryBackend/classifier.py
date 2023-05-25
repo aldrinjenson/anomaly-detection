@@ -1,4 +1,3 @@
-import gradio as gr
 import torch
 from PIL import Image
 import open_clip
@@ -42,8 +41,9 @@ def image_classifier(inp):
         # print(obj)
         return {labels[ansIndex]: 1}
 
-
-image_input = gr.inputs.Image(shape=(224, 224))
-output = gr.outputs.Label()
-demo = gr.Interface(fn=image_classifier, inputs=image_input, outputs=output)
-demo.launch(share=False)
+if __name__ == '__main__':
+    import gradio as gr
+    image_input = gr.inputs.Image(shape=(224, 224))
+    output = gr.outputs.Label()
+    demo = gr.Interface(fn=image_classifier, inputs=image_input, outputs=output)
+    demo.launch(share=False)
