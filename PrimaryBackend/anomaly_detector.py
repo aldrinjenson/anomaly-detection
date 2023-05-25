@@ -116,16 +116,19 @@ def get_single_test(files):
     sz = 200
     test = np.zeros(shape=(sz, 256, 256, 1))
     cnt = 0
+    print("files = ")
     print(files)
-    fls = sorted(files)
-    print(fls)
-    return
-    for f in fls:
-        if str(join(Config.SINGLE_TEST_PATH, f))[-3:] == "tif":
-            img = Image.open(join(Config.SINGLE_TEST_PATH, f)).resize((256, 256))
-            img = np.array(img, dtype=np.float32) / 256.0
-            test[cnt, :, :, 0] = img
-            cnt = cnt + 1
+    for f in files:
+        print("f = ", f)
+        #if str(join(Config.SINGLE_TEST_PATH, f))[-3:] == "tif":
+        #    img = Image.open(join(Config.SINGLE_TEST_PATH, f)).resize((256, 256))
+        #    img = np.array(img, dtype=np.float32) / 256.0
+        #    test[cnt, :, :, 0] = img
+        #    cnt = cnt + 1
+        img = Image.open(f).resize((256, 256))
+        img = np.array(img, dtype=np.float32) / 256.0
+        test[cnt, :, :, 0] = img
+        cnt = cnt + 1
     return test
 
 import matplotlib.pyplot as plt
@@ -134,7 +137,6 @@ from scipy.ndimage import median_filter
 
 def evaluate(files):
     test = get_single_test(files)
-    return False
     os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc_async'
     os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION']='python'
     print(os.getenv('TF_GPU_ALLOCATOR'))
@@ -153,6 +155,7 @@ def evaluate(files):
     model = get_model(reload_model=False)
     print("got model")
     test = get_single_test(files)
+    print(test)
     sz = test.shape[0] - 10 + 1
     sequences = np.zeros((sz, 10, 256, 256, 1))
     # apply the sliding window technique to get the sequences
@@ -161,18 +164,15 @@ def evaluate(files):
         for j in range(0, 10):
             clip[j] = test[i + j, :, :, :]
         sequences[i] = clip
-
     print("got data")
-    # get the reconstruction cost of all the sequences
-    #with tf.device("CPU"):
     reconstructed_sequences = model.predict(sequences,batch_size=Config.BATCH_SIZE)
     sequences_reconstruction_cost = np.array([np.linalg.norm(np.subtract(sequences[i],reconstructed_sequences[i])) for i in range(0,sz)])
     sa = (sequences_reconstruction_cost - np.min(sequences_reconstruction_cost)) / np.max(sequences_reconstruction_cost)
     sr = 1.0 - sa
     anomalies = detect_anomaly(sr,50)
     print(anomalies)
-
     return anomalies
+
 def detect_anomaly(sr,window_size):
     threshold_multiplier = 0.8
     threshold_min = 1.0

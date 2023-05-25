@@ -5,8 +5,8 @@ import cv2
 import numpy as np
 import os
 import supabase
-from classifier import image_classifier
-# from anomaly_detector import evaluate
+# from classifier import image_classifier
+from anomaly_detector import evaluate
 
 load_dotenv()
 app = Flask(__name__)
@@ -40,7 +40,7 @@ def insertCameraToDb():
 
 
 def classifyAndLogAnomalyToDb(anomalyFrame, cameraId):
-    anomalyClass = image_classifier(anomalyFrame)
+#     anomalyClass = image_classifier(anomalyFrame)
     anomalyClass = "Fire Hazard"
     newAnomaly = {
         "class": "Fire Hazard",
@@ -75,7 +75,9 @@ def save_frame(camera_id, frame):
 
 def checkForAnomaly(files):
     # call evaluate with frame
-    # evaluate(files)
+    print('going to evaluate')
+    anomalyFrame = evaluate(files)
+    print("anomalyframe = ", anomalyFrame)
 
     anomalyFrame = None
     return anomalyFrame
