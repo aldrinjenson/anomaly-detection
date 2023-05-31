@@ -6,7 +6,7 @@ import numpy as np
 import os
 import supabase
 # from classifier import image_classifier
-from anomaly_detector import evaluate
+# from anomaly_detector import evaluate
 
 load_dotenv()
 app = Flask(__name__)
@@ -95,12 +95,14 @@ def test():
 @app.route('/processfiles', methods=['POST'])
 def processfiles():
     camera_id = request.form.get('cameraId')
-    files = list(request.files.values())
-    sorted_files = sorted(files, key=lambda file: file.filename)
+    images = request.form.getlist('images')
+    files = list(images)
+    # sorted_files = sorted(files, key=lambda file: file.filename)
 
-    anomaly = checkForAnomaly(sorted_files)
-    if anomaly:
-        print(anomaly)
+
+    anomaly = checkForAnomaly(files)
+    # if anomaly:
+    #     print(anomaly)
         # classifyAndLogAnomalyToDb(anomaly, camera_id)
     # counterVal = save_frame(camera_id, img)
     # return "Saved frame: " + str(counterVal)

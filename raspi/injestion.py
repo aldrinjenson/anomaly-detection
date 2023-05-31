@@ -7,14 +7,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-frame_delimeter = 20
+FRAME_BATCH_SIZE = 20  # Number of frames to send in each batch
 counter = 0
 camera_id = 0
+frame_buffer = []  # Buffer to store frames before sending them
 
 BACKEND_SERVER_ENDPOINT = os.getenv("BACKEND_SERVER_ENDPOINT")
 
 def capture_frames(video_source, frame_rate):
-    global counter
+    global counter, frame_buffer
     capture = cv2.VideoCapture(video_source)
 
     # Check if the video source is opened
@@ -39,20 +40,36 @@ def capture_frames(video_source, frame_rate):
         # Increment the counter
         counter += 1
 
-        # Save every 20th frame to file
-        if counter % frame_delimeter == 0:
-            _, img_encoded = cv2.imencode('.jpg', frame)
+        # Save the frame to the buffer
+        frame_buffer.append(frame)
 
-            cv2.imshow('frame', frame)
-            response = requests.post(f'{BACKEND_SERVER_ENDPOINT}/process',
-                                     data={'cameraId': camera_id},
-                                     files={'image': ('image.jpg', img_encoded.tobytes())})
+        # Send the frames in batches of FRAME_BATCH_SIZE
+        if counter % FRAME_BATCH_SIZE == 0:
+            print('inside')
+            frames_to_send = frame_buffer
+            frame_buffer = []  # Clear the buffer
+
+            # Create an array of image data from the frames
+            images = [cv2.imencode('.jpg', frame)[1].tobytes() for frame in frames_to_send]
+
+            # Send the frames as an array to the endpoint
+            response = requests.post(
+                f'{BACKEND_SERVER_ENDPOINT}/processfiles',
+                data={'cameraId': camera_id, 'images':images},
+                # files={'img', images}
+                # files={'images': [(f'image{i}.jpg', img) for i, img in enumerate(images)]}
+            )
+
+            # response = requests.post(f'{BACKEND_SERVER_ENDPOINT}/processfiles',
+            #                          data={'cameraId': camera_id},
+            #                          files={'images': [('image.jpg', img) for img in images]})
 
             print('Response:', response.status_code, response.content)
 
-        # quit if the key "q" is pressed
+        # Quit if the key "q" is pressed
         if cv2.waitKey(delay) & 0xFF == ord("q"):
             break
+
     # Release the video capture object
     capture.release()
     cv2.destroyAllWindows()
