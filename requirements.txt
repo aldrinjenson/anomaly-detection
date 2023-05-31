@@ -1,4 +1,0 @@
-gradio
-open_clip
-Pillow
-torch

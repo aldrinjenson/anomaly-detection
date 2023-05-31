@@ -38,9 +38,16 @@ def insertCameraToDb():
         print("Failed to insert new row: " + insert_result["error"]["message"])
 
 
+anomalyIdsMap = {
+    'robbery': 1,
+    'vehicle': 3,
+    'fire': 2,
+    'group': 4
+}
+
 
 def classifyAndLogAnomalyToDb(anomalyFrame, cameraId):
-#     anomalyClass = image_classifier(anomalyFrame)
+    #     anomalyClass = image_classifier(anomalyFrame)
     anomalyClass = "Fire Hazard"
     newAnomaly = {
         "class": "Fire Hazard",
@@ -92,6 +99,7 @@ def index():
 def test():
     return "Yes, working fine"
 
+
 @app.route('/processfiles', methods=['POST'])
 def processfiles():
     camera_id = request.form.get('cameraId')
@@ -99,14 +107,14 @@ def processfiles():
     files = list(images)
     # sorted_files = sorted(files, key=lambda file: file.filename)
 
-
     anomaly = checkForAnomaly(files)
     # if anomaly:
     #     print(anomaly)
-        # classifyAndLogAnomalyToDb(anomaly, camera_id)
+    # classifyAndLogAnomalyToDb(anomaly, camera_id)
     # counterVal = save_frame(camera_id, img)
     # return "Saved frame: " + str(counterVal)
     return 'done bro'
+
 
 @app.route('/process', methods=['POST'])
 def process():

@@ -56,13 +56,7 @@ def capture_frames(video_source, frame_rate):
             response = requests.post(
                 f'{BACKEND_SERVER_ENDPOINT}/processfiles',
                 data={'cameraId': camera_id, 'images':images},
-                # files={'img', images}
-                # files={'images': [(f'image{i}.jpg', img) for i, img in enumerate(images)]}
             )
-
-            # response = requests.post(f'{BACKEND_SERVER_ENDPOINT}/processfiles',
-            #                          data={'cameraId': camera_id},
-            #                          files={'images': [('image.jpg', img) for img in images]})
 
             print('Response:', response.status_code, response.content)
 
