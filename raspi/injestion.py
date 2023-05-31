@@ -1,4 +1,5 @@
 import os
+from time import sleep
 import base64
 import sys
 import threading
@@ -8,13 +9,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-FRAME_BATCH_SIZE = 20  # Number of frames to send in each batch
+FRAME_BATCH_SIZE = 5  # Number of frames to send in each batch
 counter = 0
 camera_id = 0
 frame_buffer = []  # Buffer to store frames before sending them
 
-BACKEND_SERVER_ENDPOINT = os.getenv("BACKEND_SERVER_ENDPOINT")
-# BACKEND_SERVER_ENDPOINT="https://db6e-14-139-184-220.ngrok-free.app/"
+# BACKEND_SERVER_ENDPOINT = os.getenv("BACKEND_SERVER_ENDPOINT")
+BACKEND_SERVER_ENDPOINT="https://92cf-14-139-184-220.ngrok-free.app"
 
 def capture_frames(video_source, frame_rate):
     global counter, frame_buffer
@@ -56,6 +57,7 @@ def capture_frames(video_source, frame_rate):
             images = [base64.b64encode(cv2.imencode('.tif', frame)[1].tobytes()).decode('utf-8') for frame in frames_to_send]
 
             # Send the frames as an array to the endpoint
+            print('sending batch images')
             response = requests.post(
                 f'{BACKEND_SERVER_ENDPOINT}/processfiles',
                 # data={'cameraId': camera_id, 'images':images},
@@ -63,6 +65,7 @@ def capture_frames(video_source, frame_rate):
             )
 
             print('Response:', response.status_code, response.content)
+            sleep(10)
 
         # Quit if the key "q" is pressed
         if cv2.waitKey(delay) & 0xFF == ord("q"):
