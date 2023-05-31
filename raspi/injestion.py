@@ -1,4 +1,5 @@
 import os
+import base64
 import sys
 import threading
 import cv2
@@ -13,6 +14,7 @@ camera_id = 0
 frame_buffer = []  # Buffer to store frames before sending them
 
 BACKEND_SERVER_ENDPOINT = os.getenv("BACKEND_SERVER_ENDPOINT")
+# BACKEND_SERVER_ENDPOINT="https://db6e-14-139-184-220.ngrok-free.app/"
 
 def capture_frames(video_source, frame_rate):
     global counter, frame_buffer
@@ -50,12 +52,14 @@ def capture_frames(video_source, frame_rate):
             frame_buffer = []  # Clear the buffer
 
             # Create an array of image data from the frames
-            images = [cv2.imencode('.jpg', frame)[1].tobytes() for frame in frames_to_send]
+            # images = [cv2.imencode('.tif', frame)[1].tobytes() for frame in frames_to_send]
+            images = [base64.b64encode(cv2.imencode('.tif', frame)[1].tobytes()).decode('utf-8') for frame in frames_to_send]
 
             # Send the frames as an array to the endpoint
             response = requests.post(
                 f'{BACKEND_SERVER_ENDPOINT}/processfiles',
-                data={'cameraId': camera_id, 'images':images},
+                # data={'cameraId': camera_id, 'images':images},
+                data={'cameraId': camera_id, 'images': ','.join(images)},  # Convert the list to a string
             )
 
             print('Response:', response.status_code, response.content)

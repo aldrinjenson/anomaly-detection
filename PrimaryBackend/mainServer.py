@@ -1,4 +1,6 @@
-# to be running in main server
+import base64
+import io
+from PIL import Image
 from dotenv import load_dotenv
 from flask import Flask, request
 import cv2
@@ -84,7 +86,7 @@ def checkForAnomaly(files):
     # call evaluate with frame
     print('going to evaluate')
     anomalyFrame = evaluate(files)
-    print("anomalyframe = ", anomalyFrame)
+    # print("anomalyframe = ", anomalyFrame)
 
     anomalyFrame = None
     return anomalyFrame
@@ -103,9 +105,26 @@ def test():
 @app.route('/processfiles', methods=['POST'])
 def processfiles():
     camera_id = request.form.get('cameraId')
-    images = request.form.getlist('images')
-    files = list(images)
-    # sorted_files = sorted(files, key=lambda file: file.filename)
+
+
+    images_string = request.form.get('images')
+    images = images_string.split(',')  # Split the string into a list
+    
+    # images = request.form.getlist('images')
+    # files = list(images)
+    files = images
+
+    # print(files[0])
+    print(type(files[0]))
+
+    f = files[0]
+    image_bytes = [base64.b64decode(img) for img in files]
+    image_files = [io.BytesIO(img) for img in image_bytes]
+
+    files = image_files
+    # image_data = f
+    # image_bytes = base64.b64decode(image_data)
+    # image = Image.open(io.BytesIO(image_bytes)).resize((256, 256))
 
     anomaly = checkForAnomaly(files)
     # if anomaly:
