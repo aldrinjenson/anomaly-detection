@@ -9,13 +9,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-FRAME_BATCH_SIZE = 5  # Number of frames to send in each batch
+FRAME_BATCH_SIZE = 30  # Number of frames to send in each batch
 counter = 0
-camera_id = 0
+camera_id = -1
 frame_buffer = []  # Buffer to store frames before sending them
 
 # BACKEND_SERVER_ENDPOINT = os.getenv("BACKEND_SERVER_ENDPOINT")
-BACKEND_SERVER_ENDPOINT="https://92cf-14-139-184-220.ngrok-free.app"
+BACKEND_SERVER_ENDPOINT="https://e5c5-14-139-184-220.ngrok-free.app"
 
 def capture_frames(video_source, frame_rate):
     global counter, frame_buffer
@@ -87,7 +87,7 @@ if __name__ == '__main__':
         camera_id = sys.argv[2]
     else:
         video_source = 0
-        camera_id = 0
+        camera_id = 16
     print(video_source)
 
     # Create and start the thread to capture frames from the camera
