@@ -6,7 +6,7 @@ import numpy as np
 import os
 import supabase
 # from classifier import image_classifier
-# from anomaly_detector import evaluate
+from anomaly_detector import evaluate
 
 load_dotenv()
 app = Flask(__name__)
