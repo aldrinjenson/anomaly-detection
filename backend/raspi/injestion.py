@@ -1,6 +1,4 @@
 import os
-from time import sleep
-import base64
 import sys
 import threading
 import cv2
@@ -9,16 +7,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-FRAME_BATCH_SIZE = 30  # Number of frames to send in each batch
+frame_delimeter = 20
 counter = 0
-camera_id = -1
-frame_buffer = []  # Buffer to store frames before sending them
+camera_id = 0
 
-# BACKEND_SERVER_ENDPOINT = os.getenv("BACKEND_SERVER_ENDPOINT")
-BACKEND_SERVER_ENDPOINT="https://e5c5-14-139-184-220.ngrok-free.app"
+BACKEND_SERVER_ENDPOINT = os.getenv("BACKEND_SERVER_ENDPOINT")
 
 def capture_frames(video_source, frame_rate):
-    global counter, frame_buffer
+    global counter
     capture = cv2.VideoCapture(video_source)
 
     # Check if the video source is opened
@@ -43,34 +39,20 @@ def capture_frames(video_source, frame_rate):
         # Increment the counter
         counter += 1
 
-        # Save the frame to the buffer
-        frame_buffer.append(frame)
+        # Save every 20th frame to file
+        if counter % frame_delimeter == 0:
+            _, img_encoded = cv2.imencode('.jpg', frame)
 
-        # Send the frames in batches of FRAME_BATCH_SIZE
-        if counter % FRAME_BATCH_SIZE == 0:
-            print('inside')
-            frames_to_send = frame_buffer
-            frame_buffer = []  # Clear the buffer
-
-            # Create an array of image data from the frames
-            # images = [cv2.imencode('.tif', frame)[1].tobytes() for frame in frames_to_send]
-            images = [base64.b64encode(cv2.imencode('.tif', frame)[1].tobytes()).decode('utf-8') for frame in frames_to_send]
-
-            # Send the frames as an array to the endpoint
-            print('sending batch images')
-            response = requests.post(
-                f'{BACKEND_SERVER_ENDPOINT}/processfiles',
-                # data={'cameraId': camera_id, 'images':images},
-                data={'cameraId': camera_id, 'images': ','.join(images)},  # Convert the list to a string
-            )
+            cv2.imshow('frame', frame)
+            response = requests.post(f'{BACKEND_SERVER_ENDPOINT}/process',
+                                     data={'cameraId': camera_id},
+                                     files={'image': ('image.jpg', img_encoded.tobytes())})
 
             print('Response:', response.status_code, response.content)
-            sleep(10)
 
-        # Quit if the key "q" is pressed
+        # quit if the key "q" is pressed
         if cv2.waitKey(delay) & 0xFF == ord("q"):
             break
-
     # Release the video capture object
     capture.release()
     cv2.destroyAllWindows()
@@ -87,7 +69,7 @@ if __name__ == '__main__':
         camera_id = sys.argv[2]
     else:
         video_source = 0
-        camera_id = 16
+        camera_id = 0
     print(video_source)
 
     # Create and start the thread to capture frames from the camera

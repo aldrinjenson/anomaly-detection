@@ -1,6 +1,11 @@
-# Anomaly Detection 
+# Anomaly-Detection using LSTM based network
 
-- create a folder called "images" in the root directory (is part of .gitignore)
-- run [multiDetect.py](multiDevice.py)
-- add image processing code in the processFrame function
+Computer Science Final year project.
+
+## Contributors
+
+- Aldirn Jenson (Backend, Classifier Model, Ingestion server, DB)
+- Nayana Vinod (Front End, DB, Auth)
+- Gouri Hariharan (Front End)
+- Adithya Anilkumar (LSTM Model)
 

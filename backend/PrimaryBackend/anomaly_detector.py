@@ -125,10 +125,8 @@ def get_single_test(files):
         #    img = np.array(img, dtype=np.float32) / 256.0
         #    test[cnt, :, :, 0] = img
         #    cnt = cnt + 1
-        img = Image.open(f).convert('L').resize((256, 256)) # extra conversion change
-        print("opened image")
+        img = Image.open(f).resize((256, 256))
         img = np.array(img, dtype=np.float32) / 256.0
-     #    img = np.expand_dims(img, axis=-1)  # Add an extra dimension to match the shape of 'test'
         test[cnt, :, :, 0] = img
         cnt = cnt + 1
     return test
@@ -138,7 +136,6 @@ import tensorflow as tf
 from scipy.ndimage import median_filter
 
 def evaluate(files):
-    print('starting evaluation')
     test = get_single_test(files)
     os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc_async'
     os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION']='python'
@@ -158,7 +155,7 @@ def evaluate(files):
     model = get_model(reload_model=False)
     print("got model")
     test = get_single_test(files)
-    # print(test)
+    print(test)
     sz = test.shape[0] - 10 + 1
     sequences = np.zeros((sz, 10, 256, 256, 1))
     # apply the sliding window technique to get the sequences

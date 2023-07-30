@@ -1,14 +1,12 @@
-import base64
-import io
-from PIL import Image
+# to be running in main server
 from dotenv import load_dotenv
 from flask import Flask, request
 import cv2
 import numpy as np
 import os
 import supabase
-from classifier import image_classifier
-from anomaly_detector import evaluate
+# from classifier import image_classifier
+# from anomaly_detector import evaluate
 
 load_dotenv()
 app = Flask(__name__)
@@ -20,17 +18,30 @@ supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_KEY")
 supabase_client = supabase.create_client(supabase_url, supabase_key)
 
-anomalyIdsMap = {
-    'robbery': 1,
-    'vehicle': 3,
-    'fire': 2,
-    'group': 4
-}
+
+def insertCameraToDb():
+    new_camera = {
+        "coordinates": {
+            "lat": 37.7749,
+            "lng": -122.4194
+        },
+        "frame_rate": 30,
+        "camera_description": "Camera at MEC"
+    }
+
+    insert_result = supabase_client.table(
+        "cameras").insert(new_camera).execute()
+
+    if insert_result:
+        print("New row was inserted successfully!")
+    else:
+        print("Failed to insert new row: " + insert_result["error"]["message"])
+
 
 
 def classifyAndLogAnomalyToDb(anomalyFrame, cameraId):
-    anomalyClass = image_classifier(anomalyFrame)
-    # anomalyClass = "Fire Hazard"
+#     anomalyClass = image_classifier(anomalyFrame)
+    anomalyClass = "Fire Hazard"
     newAnomaly = {
         "class": "Fire Hazard",
         "camera_id": 8,
@@ -66,9 +77,9 @@ def checkForAnomaly(files):
     # call evaluate with frame
     print('going to evaluate')
     anomalyFrame = evaluate(files)
-    # print("anomalyframe = ", anomalyFrame)
+    print("anomalyframe = ", anomalyFrame)
 
-    # anomalyFrame = None
+    anomalyFrame = None
     return anomalyFrame
 
 
@@ -76,49 +87,40 @@ def checkForAnomaly(files):
 def index():
     return "Anomaly detection server - alive and kicking 🤟"
 
+
+@app.route('/test')
+def test():
+    return "Yes, working fine"
+
 @app.route('/processfiles', methods=['POST'])
 def processfiles():
-    print('request received bro')
     camera_id = request.form.get('cameraId')
-    images_string = request.form.get('images')
-    print("Length of image_string = ", len(images_string))
-    print('image string kitti bro')
-    images = images_string.split(',')  # Split the string into a list
-    files = images
+    files = list(request.files.values())
+    sorted_files = sorted(files, key=lambda file: file.filename)
 
-    f = files[0]
-    image_bytes = [base64.b64decode(img) for img in files]
-    image_files = [io.BytesIO(img) for img in image_bytes]
-
-    files = image_files
-    # image_data = f
-    # image_bytes = base64.b64decode(image_data)
-    # image = Image.open(io.BytesIO(image_bytes)).resize((256, 256))
-
-    anomaly = checkForAnomaly(files)
+    anomaly = checkForAnomaly(sorted_files)
     if anomaly:
         print(anomaly)
-        print('anomaly obtained, classifying..')
-        classifyAndLogAnomalyToDb(image_files[0], camera_id)
+        # classifyAndLogAnomalyToDb(anomaly, camera_id)
     # counterVal = save_frame(camera_id, img)
     # return "Saved frame: " + str(counterVal)
     return 'done bro'
 
+@app.route('/process', methods=['POST'])
+def process():
+    camera_id = request.form.get('cameraId')
+    print(camera_id)
+    file = request.files['image']
+    npimg = np.fromfile(file, np.uint8)
+    img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
-#@app.route('/process', methods=['POST'])
-#def process():
-#    camera_id = request.form.get('cameraId')
-#    print(camera_id)
-#    file = request.files['image']
-#    npimg = np.fromfile(file, np.uint8)
-#    img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
-#
-#    anomalyFrame = checkForAnomaly(frame)
-#    if anomaly:
-#        classifyAndLogAnomalyToDb(anomalyFrame, camera_id)
-#    counterVal = save_frame(camera_id, img)
-#    return "Saved frame: " + str(counterVal)
-#
+    # anomalyFrame = checkForAnomaly(frame)
+    anomalyFrame = False
+    if anomalyFrame:
+        classifyAndLogAnomalyToDb(anomalyFrame, camera_id)
+    counterVal = save_frame(camera_id, img)
+    return "Saved frame: " + str(counterVal)
+
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=False)
