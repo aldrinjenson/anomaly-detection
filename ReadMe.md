@@ -16,3 +16,12 @@ Due to limited performance of manual monitoring, law enforcement agencies are ha
 ## Project Report
 
 Check: [Report](/project_report.pdf)
+
+## References
+
+- http://www.svcl.ucsd.edu/projects/anomaly/dataset.htm
+
+## Special Thanks to
+
+- Dr. Preetha Theresa Joy - HOD: CS department at Model Engineering College
+- Mr. Sreekumar K : Assistant Professor - CS Department MEC
